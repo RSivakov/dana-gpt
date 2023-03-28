@@ -2,7 +2,6 @@
   "name": "dana-gpt",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "repository": "git@github.com:RSivakov/dana-gpt.git",
   "author": "Roman Sivakov <romansivakov@gmail.com>",
   "license": "MIT",
