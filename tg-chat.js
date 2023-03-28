@@ -1,43 +1,21 @@
 const Telegraf = require('telegraf');
-const openai = require('openai');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-// Указываем токен для телеграм-бота
-const bot = new Telegraf('YOUR_TELEGRAM_BOT_TOKEN');
+const app = express();
+app.use(bodyParser.json());
 
-// Указываем токен и модель для OpenAI API
-const openai_token = 'YOUR_OPENAI_API_TOKEN';
-const model_engine = 'davinci'; // Вы можете использовать другой движок, если хотите
+const bot = new Telegraf(TOKEN_BOT);
 
-// Создаем клиента OpenAI
-const client = new openai.LanguageModelApi(openai_token);
-
-// Обработчик команды /start
-bot.start((ctx) => {
-  ctx.reply('Привет! Я могу говорить на любые темы, задайте мне вопрос.');
+bot.on('message', (ctx) => {
+  console.log(ctx.message);
+  ctx.reply('Hello from Dana! I love my new GPT body! Go! I need a testdrive! Go to speak with me. Enjoy');
 });
 
-// Обработчик текстовых сообщений
-bot.on('text', (ctx) => {
-  // Получаем текст сообщения
-  const message = ctx.message.text;
-
-  // Вызываем OpenAI API для генерации ответа
-  client.complete({
-    engine: model_engine,
-    prompt: message,
-    maxTokens: 150,
-    n: 1,
-    stop: '\n',
-  })
-  .then((response) => {
-    // Отправляем ответ пользователю
-    ctx.reply(response.choices[0].text);
-  })
-  .catch((err) => {
-    console.error(err);
-    ctx.reply('Произошла ошибка при генерации ответа.');
-  });
+app.post(`/bot${bot.token}`, (req, res) => {
+  bot.handleUpdate(req.body, res);
 });
 
-// Запускаем бота
-bot.launch();
+app.listen(process.env.PORT || 3000, () => {
+  console.log('Express server started');
+});
