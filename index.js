@@ -1,29 +1,78 @@
-import { Telegraf } from 'telegraf';
-import express from 'express';
-import bodyParser from 'body-parser';
-import dotenv from "dotenv";
+require('dotenv').config()
+const { Configuration, OpenAIApi } = require("openai");
+const { getImage, getChat } = require("./Helper/functions");
+const { Telegraf } = require("telegraf");
 
+const configuration = new Configuration({
+  apiKey: process.env.API,
+});
+const openai = new OpenAIApi(configuration);
+module.exports = openai;
 
-// const Telegraf = require('telegraf');
-// const express = require(Express);
-// const bodyParser = require('body-parser');
+const bot = new Telegraf(process.env.TG_API);
+bot.start((ctx) => ctx.reply("Welcome , You can ask anything from me"));
 
-const app = express();
-app.use(bodyParser.json());
-// Load environment variables.
-dotenv.config();
-const {TOKEN_BOT } = process.env;
-const bot = new Telegraf(TOKEN_BOT);
-
-bot.on('message', (ctx) => {
-  console.log(ctx.message);
-  ctx.reply('Hello from Dana! I love my new GPT body! Go! I need a testdrive! Go to speak with me. Enjoy');
+bot.help((ctx) => {
+  ctx.reply(
+    "This bot can perform the following command \n /image -> to create image from text \n /ask -> ank anything from me "
+  );
 });
 
-app.post(`/bot${bot.token}`, (req, res) => {
-  bot.handleUpdate(req.body, res);
+
+
+// Image command
+bot.command("image", async (ctx) => {
+  const text = ctx.message.text?.replace("/image", "")?.trim().toLowerCase();
+
+  if (text) {
+   
+    const res = await getImage(text);
+
+    if (res) {
+      ctx.sendChatAction("upload_photo");
+      // ctx.sendPhoto(res);
+      // ctx.telegram.sendPhoto()
+      ctx.telegram.sendPhoto(ctx.message.chat.id, res, {
+        reply_to_message_id: ctx.message.message_id,
+      });
+    }
+  } else {
+    ctx.telegram.sendMessage(
+      ctx.message.chat.id,
+      "You have to give some description after /image",
+      {
+        reply_to_message_id: ctx.message.message_id,
+      }
+    );
+  }
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log('Express server started');
+// Chat command
+
+bot.command("ask", async (ctx) => {
+  const text = ctx.message.text?.replace("/ask", "")?.trim().toLowerCase();
+
+  if (text) {
+    ctx.sendChatAction("typing");
+    const res = await getChat(text);
+    if (res) {
+      ctx.telegram.sendMessage(ctx.message.chat.id, res, {
+        reply_to_message_id: ctx.message.message_id,
+      });
+    }
+  } else {
+    ctx.telegram.sendMessage(
+      ctx.message.chat.id,
+      "Please ask anything after /ask",
+      {
+        reply_to_message_id: ctx.message.message_id,
+      }
+    );
+  
+    //  reply("Please ask anything after /ask");
+  }
 });
+
+
+
+bot.launch();
