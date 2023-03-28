@@ -74,6 +74,21 @@ bot.command("ask", async (ctx) => {
   }
 });
 
+bot.on("message", async (msg) => {
+  const baseCompletion = await openai.createCompletion({
+      model: 'text-davinci-003',
+      prompt: `${msg.text}.\n`,
+      temperature: 0.8,
+      max_tokens: 4000,
+  })
 
+  console.log(baseCompletion.data.usage?.prompt_tokens)
+  const basePromptOuput = baseCompletion.data.choices.pop()
+
+  const chatId = msg.chat.id
+
+  invariant(basePromptOuput?.text, "Не удалось получить ответ от open ai")
+  bot.sendMessage(chatId, basePromptOuput?.text)
+})
 
 bot.launch();
