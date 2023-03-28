@@ -1,0 +1,15 @@
+{
+  "name": "dana-gpt",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "repository": "git@github.com:RSivakov/dana-gpt.git",
+  "author": "Roman Sivakov <romansivakov@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parse": "^0.1.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "telegraf": "^4.12.2"
+  }
+}

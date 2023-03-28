@@ -1,10 +1,18 @@
-const Telegraf = require('telegraf');
-const express = require('express');
-const bodyParser = require('body-parser');
+import { Telegraf } from 'telegraf';
+import express from 'express';
+import bodyParser from 'body-parser';
+import dotenv from "dotenv";
+
+
+// const Telegraf = require('telegraf');
+// const express = require(Express);
+// const bodyParser = require('body-parser');
 
 const app = express();
 app.use(bodyParser.json());
-
+// Load environment variables.
+dotenv.config();
+const {TOKEN_BOT } = process.env;
 const bot = new Telegraf(TOKEN_BOT);
 
 bot.on('message', (ctx) => {
